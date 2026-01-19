@@ -1,4 +1,7 @@
-export default function CommonLayout({ children }) {
+import { onBoardUser } from "@/modules/auth/actions"
+
+export default async function CommonLayout({ children }) {
+    await onBoardUser();
 
     return (
         <div className="flex flex-col min-h-screen relative overflow-x-hidden">
