@@ -17,8 +17,24 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { getSupabaseBrowserClient } from "@/lib/supabase/supabase-client";
+import { useRouter } from "next/navigation";
 
 export function NavBar({ user }) {
+
+    const supabase = getSupabaseBrowserClient();
+    const router = useRouter()
+
+    const handleSignOut = async () => {
+        const { error } = await supabase.auth.signOut()
+
+        if (error) {
+            toast.error("Faild to Sign Out!")
+        }
+
+        router.refresh()
+
+    }
 
 
     return (
@@ -68,7 +84,7 @@ export function NavBar({ user }) {
                                 <DropdownMenuItem className={"cursor-pointer"}><Link href={"/profile"}>Profile</Link></DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                    // onClick={handleSignOut}
+                                    onClick={handleSignOut}
                                     className={"cursor-pointer"}>
                                     Log out
                                     <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

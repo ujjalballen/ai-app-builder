@@ -40,19 +40,17 @@ export async function onBoardUser() {
             }
         };
 
-
         const { id, user_metadata } = user;
-        const { name, email, avatar_url: avatarUrl } = user_metadata || {};
 
         const newUser = await database.user.upsert({
             where: {
                 supabaseUserId: id
             },
-            update: { name, avatarUrl }, // only updated the name and image_url
+            update: { name: user_metadata.name, image_url: user_metadata.avatar_url },
             create: {
-                name: name,
-                email: email,
-                image_url: avatarUrl,
+                name: user_metadata.name,
+                email: user_metadata.email,
+                image_url: user_metadata.avatar_url,
                 supabaseUserId: id
             }
         })

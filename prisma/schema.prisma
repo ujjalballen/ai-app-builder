@@ -18,7 +18,7 @@ model User{
   id String @id @default(cuid())
   email String @unique
   name String?
-  image_url String
+  image_url String?
   supabaseUserId String @unique
 
   createdAt DateTime @default(now())
