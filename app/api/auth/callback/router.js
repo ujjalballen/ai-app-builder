@@ -14,7 +14,8 @@ export async function GET(request) {
 
     if (code) {
         const supabase = await getSupabaseServer()
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
+        const { data: { session }, error } = await supabase.auth.exchangeCodeForSession(code)
+
         if (!error) {
             const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
             const isLocalEnv = process.env.NODE_ENV === 'development'
@@ -26,6 +27,40 @@ export async function GET(request) {
             } else {
                 return NextResponse.redirect(`${origin}${next}`)
             }
+        };
+
+
+        // 2. CHECK: Only run if we have a valid session user
+        if (session.user) {
+
+            //METHOD 01: => We use upsert to ensure we don't crash if the user already exists
+            /*             await prisma.user.upsert({
+                            where: { id: session.user.id },
+                            update: {
+                                email: session.user.email,
+                                // Update avatar/name in case they changed on Google
+                                name: session.user.user_metadata.full_name,
+                                avatarUrl: session.user.user_metadata.avatar_url,
+                            },
+                            create: {
+                                id: session.user.id,
+                                email: session.user.email,
+                                name: session.user.user_metadata.full_name,
+                                avatarUrl: session.user.user_metadata.avatar_url,
+                            },
+                        }) */
+
+            // METHOD 02: => Using Server Action
+            console.log("Session verified. Syncing with database...")
+
+            const result = await onBoardUser();
+
+            if (!result.success) {
+                console.error("Onboarding failed:", result.error)
+                // You might want to redirect to a specific error page here
+                // or just let them through and try to fix it later.
+            }
+
         }
     }
 

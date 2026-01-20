@@ -2,7 +2,7 @@
 
 import database from "@/lib/db";
 import { getSupabaseServer } from "@/lib/supabase/supabase-server";
-import { success } from "zod";
+
 
 export async function currentUser() {
     try {
