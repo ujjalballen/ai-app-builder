@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import TextAreaAutosize from "react-textarea-autosize";
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon } from "lucide-react";
+import { onInvoke } from "../actions";
 
 const formSchema = z.object({
     content: z.string().min(1, "Description is Required").max(1000, "Description is too long")
@@ -92,8 +93,23 @@ export default function ProjectsForm() {
         }
     }
 
+
+    const onInvokeAI = async () => {
+        try {
+            const res = await onInvoke();
+            console.log("resAI;", res)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div className="space-y-8">
+            <Button
+                onClick={onInvokeAI}
+            >
+                OnInnvoke Button
+            </Button>
 
             {/* Template Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

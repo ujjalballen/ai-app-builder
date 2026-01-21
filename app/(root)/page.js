@@ -2,6 +2,9 @@ import ProjectsForm from "@/modules/home/components/project-form";
 import Image from "next/image";
 
 export default function HomePage() {
+
+
+
   return (
     <div className='flex items-center justify-center w-full px-4 py-8'>
 
