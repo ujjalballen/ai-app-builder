@@ -47,7 +47,7 @@ export default function GoogleSignIn() {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute w-96 h-96 -top-48 -left-48 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
