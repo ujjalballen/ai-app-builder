@@ -11,6 +11,8 @@ import TextAreaAutosize from "react-textarea-autosize";
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon } from "lucide-react";
 import { onInvoke } from "../actions";
+import { useCreateProject } from "@/modules/projects/hooks/project";
+import { Spinner } from "@/components/ui/spinner";
 
 const formSchema = z.object({
     content: z.string().min(1, "Description is Required").max(1000, "Description is too long")
@@ -70,46 +72,40 @@ const PROJECT_TEMPLATES = [
 
 export default function ProjectsForm() {
     const [isFocused, setIsFocused] = useState(false);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
     const router = useRouter();
+
+    const { mutateAsync, isPending } = useCreateProject();
 
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             content: ""
-        }
+        },
+        mode: "onChange"
     });
 
     const handleTemplate = (prompt) => {
         form.setValue("content", prompt);
     };
 
-    const onSubmit = async () => {
+    const onSubmit = async (values) => {
         try {
             console.log("submit triggered")
-
+            const result = await mutateAsync(values.content)
+            router.push(`/project/${res.id}`)
+            toast.success("Project created successfully")
+            form.reset()
         } catch (error) {
             toast.error(error.message || "Failed to create project");
         }
     }
 
+    const isButtonDisabled = isPending || !form.watch("content").trim();
 
-    const onInvokeAI = async () => {
-        try {
-            const res = await onInvoke();
-            console.log("resAI;", res)
-        } catch (error) {
-            console.log(error)
-        }
-    }
+
 
     return (
         <div className="space-y-8">
-            <Button
-                onClick={onInvokeAI}
-            >
-                OnInnvoke Button
-            </Button>
 
             {/* Template Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -191,8 +187,11 @@ export default function ProjectsForm() {
                             className={cn("size-8 rounded-full",
                                 isButtonDisabled && "bg-muted-foreground border"
                             )}
+                            disabled={isButtonDisabled}
                         >
-                            <ArrowUpIcon className="size-4" />
+                            {
+                                isPending ? (<Spinner />) : (<ArrowUpIcon className="size-4" />)
+                            }
                         </Button>
                     </div>
                 </form>

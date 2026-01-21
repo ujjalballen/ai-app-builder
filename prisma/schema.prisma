@@ -13,14 +13,60 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String?
+  image_url      String?
+  supabaseUserId String    @unique
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  projects       Project[]
+}
 
-model User{
-  id String @id @default(cuid())
-  email String @unique
-  name String?
-  image_url String?
-  supabaseUserId String @unique
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum MessageType {
+  RESULT
+  ERROR
+}
+
+model Message {
+  id      String      @id @default(cuid())
+  content String
+  role    MessageRole
+  type    MessageType
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  Fragments Fragment[]
+}
+
+model Fragment {
+  id         String  @id @default(cuid())
+  messageId  String  @unique
+  message    Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  sandboxUrl String
+  title      String
+  files      Json
+
+  cratedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

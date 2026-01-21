@@ -4,6 +4,9 @@ import { Sandbox } from '@e2b/code-interpreter'
 import z from "zod";
 import { PROMPT } from "@/prompt";
 import { lastAssistantTextMessageContent } from "./utils";
+import database from "@/lib/db";
+import { MessageRole, MessageType } from "@prisma/client";
+
 
 export const codeAgentFunction = inngest.createFunction(
   { id: "code-agent" },
@@ -164,6 +167,36 @@ export const codeAgentFunction = inngest.createFunction(
 
       console.log(`General sandbox host URL: ${host}`);
       return host;
+    })
+
+
+    await step.run("save-result", async () => {
+      if (isError) {
+        return await database.message.create({
+          data: {
+            projectId: event.data.projectId,
+            content: "Something went Wrong. Plz try again later",
+            role: MessageRole.ASSISSTANT,
+            type: MessageType.ERROR
+          }
+        })
+      }
+
+      return await database.message.create({
+        data: {
+          projectId: event.data.projectId,
+          content: result.state.data.summary,
+          role: MessageRole.ASSISTANT,
+          type: MessageType.RESULT,
+          fragments: {
+            create: {
+              sandboxUrl: sandboxUrl,
+              title: "Untitled",
+              files: result.state.data.files
+            }
+          }
+        }
+      })
     })
 
     return {
