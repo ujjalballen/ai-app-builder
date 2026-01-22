@@ -13,6 +13,7 @@ import ProjectHeader from "./project-header";
 import MessageContainer from "./message-container";
 import { Code, CrownIcon, EyeIcon } from "lucide-react";
 import FragmentWeb from "./fragment-web";
+import { FileExplorer } from "./file-explorer";
 
 export default function ProjectView({ projectId }) {
 
@@ -100,7 +101,15 @@ export default function ProjectView({ projectId }) {
                         <TabsContent value="code"
                             className={"flex-1 h-[calc(100%-4rem)] overflow-hidden"}
                         >
-
+                            {
+                                activeFragment?.files ? (
+                                    <FileExplorer files={activeFragment.files} />
+                                ) : (
+                                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                                        Select a fragment to view code
+                                    </div>
+                                )
+                            }
 
                         </TabsContent>
                     </Tabs>
