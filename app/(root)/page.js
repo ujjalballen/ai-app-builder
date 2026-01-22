@@ -1,4 +1,5 @@
 import ProjectsForm from "@/modules/home/components/project-form";
+import ProjectList from "@/modules/home/components/project-list";
 import Image from "next/image";
 
 export default function HomePage() {
@@ -28,7 +29,7 @@ export default function HomePage() {
           <div className='max-w-3xl w-full'>
             <ProjectsForm />
           </div>
-          {/* <ProjectList/> */}
+          <ProjectList/>
         </section>
       </div>
     </div>
