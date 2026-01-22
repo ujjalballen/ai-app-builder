@@ -10,8 +10,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ProjectHeader from "./project-header";
+import MessageContainer from "./message-container";
 
 export default function ProjectView({ projectId }) {
+
+      const [activeFragment, setActiveFragment] = useState(null);
 
     return (
         <div className="h-screen">
@@ -25,12 +28,17 @@ export default function ProjectView({ projectId }) {
 
 
                     {/* TODO Message Container */}
+                    <MessageContainer
+                        projectId={projectId}
+                        activeFragment={activeFragment}
+                        setActiveFragment={setActiveFragment}
+                    />
 
                 </ResizablePanel>
-                 <ResizableHandle withHandle />
-                  <ResizablePanel defaultSize={65} minSize={50}>
+                <ResizableHandle withHandle />
+                <ResizablePanel defaultSize={65} minSize={50}>
                     {/* Todo add tabs */}
-                  </ResizablePanel>
+                </ResizablePanel>
 
             </ResizablePanelGroup>
         </div>
