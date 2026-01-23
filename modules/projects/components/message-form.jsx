@@ -14,6 +14,8 @@ import { onInvoke } from "../actions";
 
 import { Spinner } from "@/components/ui/spinner";
 import { useCreateMessages } from "@/modules/messages/hooks/message";
+import { useStatus } from "@/modules/usage/hooks/usage";
+import { Usage } from "@/modules/usage/components/usage";
 
 const formSchema = z.object({
     content: z.string().min(1, "Message is Required").max(1000, "Message is too long")
@@ -22,6 +24,11 @@ const formSchema = z.object({
 
 export default function MessageForm({ projectId }) {
     const [isFocused, setIsFocused] = useState(false);
+
+    const { data: usage } = useStatus();
+
+    const showUsage = !!usage;
+
 
     const { mutateAsync, isPending } = useCreateMessages(projectId);
 
@@ -52,6 +59,12 @@ export default function MessageForm({ projectId }) {
 
 
         <Form {...form}>
+
+            {
+                showUsage && (
+                    <Usage />
+                )
+            }
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className={cn(

@@ -4,6 +4,7 @@ import { MessageRole, MessageType } from "@prisma/client";
 import { inngest } from "@/app/inngest/client";
 import { getCurrentSingelUser } from "@/modules/auth/actions";
 import database from "@/lib/db";
+import { consumeCredits } from "@/lib/usage";
 
 
 export async function createMessage(value, projectId) {
@@ -18,6 +19,25 @@ export async function createMessage(value, projectId) {
     });
 
     if (!project) throw new Error("Project not found!");
+
+    // consume credits
+    try {
+        await consumeCredits();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error({
+                code: "BAD_REQUEST",
+                message: "Something went wrong"
+            })
+        }
+        else {
+            throw new Error({
+                code: "TOO_MANY_REQUESTS",
+                message: "Too many requests"
+            })
+        }
+    }
+
 
     const newMessage = await database.message.create({
         data: {

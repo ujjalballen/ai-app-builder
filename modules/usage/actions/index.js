@@ -1,0 +1,46 @@
+"use server";
+
+import { DURATION, FREE_POINTS, PRO_POINTS, getUsageStatus } from "@/lib/usage";
+
+export async function status() {
+    try {
+        const { id } = await currentUser();
+
+        if (!id) {
+            throw new Error("Unauthorized")
+        };
+
+        let hasProAccess = false;
+        if (user?.user_metadata?.role === "PRO") {
+            hasProAccess = true
+        }
+
+        const maxPoints = hasProAccess ? PRO_POINTS : FREE_POINTS;
+
+        const result = await getUsageStatus()
+
+        if (!result) {
+            return {
+                remainingPoints: maxPoints,
+                msBeforeNext: DURATION * 1000,
+                consumedPoints: 0,
+                isFirstRequest: true,
+                maxPoints
+            };
+        };
+
+        const remainingPoints = result.remainingPoints ?? (maxPoints - (result.consumedPoints || 0));
+
+        return {
+            remainingPoints,
+            msBeforeNext: result.msBeforeNext || DURATION * 1000,
+            consumedPoints: result.consumedPoints || 0,
+            isFirstRequest: false,
+            maxPoints
+        };
+
+    } catch (error) {
+        console.error("Error in status action:", error);
+        throw error;
+    }
+}

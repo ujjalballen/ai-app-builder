@@ -70,3 +70,10 @@ model Fragment {
   cratedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model Usage{
+  key String @id
+  points String
+  expire DateTime?
+}

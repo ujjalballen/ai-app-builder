@@ -21,7 +21,7 @@ export function useCreateProject() {
         mutationFn: (value) => createProject(value),
         onSuccess: () => {
 
-            queryClient.invalidateQueries({ queryKey: ["projects"] })
+            queryClient.invalidateQueries({ queryKey: ["projects", "status"] })
         }
     })
 }

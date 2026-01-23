@@ -2,6 +2,7 @@
 
 import { inngest } from "@/app/inngest/client";
 import database from "@/lib/db";
+import { consumeCredits } from "@/lib/usage";
 import { getCurrentSingelUser } from "@/modules/auth/actions";
 import { MessageRole, MessageType } from "@prisma/client";
 import { generateSlug } from "random-word-slugs";
@@ -12,6 +13,25 @@ export async function createProject(value) {
     if (!user) {
         throw new Error("Unauthorized")
     };
+
+
+    // consume credits
+    try {
+        await consumeCredits();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error({
+                code: "BAD_REQUEST",
+                message: "Something went wrong"
+            })
+        }
+        else {
+            throw new Error({
+                code: "TOO_MANY_REQUESTS",
+                message: "Too many requests"
+            })
+        }
+    }
 
     const newProject = await database.project.create({
         data: {
