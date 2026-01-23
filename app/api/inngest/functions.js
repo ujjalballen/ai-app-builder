@@ -1,5 +1,5 @@
 import { inngest } from "@/app/inngest/client";
-import { gemini, createAgent, createTool, createNetwork } from "@inngest/agent-kit";
+import { gemini, createAgent, createTool, createNetwork, createState } from "@inngest/agent-kit";
 import { Sandbox } from '@e2b/code-interpreter'
 import z from "zod";
 import { FRAGMENT_TITLE_PROMPT, PROMPT, RESPONSE_PROMPT } from "@/prompt";
@@ -17,6 +17,44 @@ export const codeAgentFunction = inngest.createFunction(
       const sandBox = await Sandbox.create("ai-app-builder");
       return sandBox.sandboxId;
     });
+
+
+    const previousMessages = await step.run(
+      "get-previous-messages",
+      async () => {
+        const formattedMessages = [];
+
+        const messages = await db.message.findMany({
+          where: {
+            projectId: event.data.projectId
+          },
+          orderBy: {
+            createdAt: "desc"
+          }
+        })
+
+        for (const message of messages) {
+          formattedMessages.push({
+            type: "text",
+            role: message.role === "ASSISTANT" ? "assistant" : "user",
+            content: message.content
+          })
+        }
+
+        return formattedMessages
+      }
+    );
+
+
+    const state = createState({
+      summary: "",
+      files: {}
+    }
+      ,
+      {
+        messages: previousMessages
+      }
+    )
 
     const codeAgent = createAgent({
       name: "Hello Agent",
@@ -192,8 +230,8 @@ export const codeAgentFunction = inngest.createFunction(
     })
 
 
-     const generateResponse = ()=>{
-       if (responseOutput[0].type !== "text") {
+    const generateResponse = () => {
+      if (responseOutput[0].type !== "text") {
         return "Here you go";
       }
 
